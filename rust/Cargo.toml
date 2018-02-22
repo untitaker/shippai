@@ -1,0 +1,8 @@
+[package]
+name = "shippai"
+version = "0.1.0"
+description = "failure in other languages"
+authors = ["Markus Unterwaditzer <markus@unterwaditzer.net>"]
+
+[dependencies]
+failure = "0.1"

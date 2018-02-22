@@ -1,0 +1,15 @@
+[package]
+name = "shippai-example"
+version = "0.1.0"
+authors = ["Markus Unterwaditzer <markus@unterwaditzer.net>"]
+
+[lib]
+name = "shippai_example"
+crate-type = ["cdylib"]
+
+[dependencies]
+failure = "0.1"
+shippai = { path = "../../../rust/", version = "*" }
+
+[build-dependencies]
+cbindgen = "0.4"

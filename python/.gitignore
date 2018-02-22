@@ -1,0 +1,10 @@
+__pycache__
+*.pyc
+*.egg-info
+.eggs
+*/rust/target
+*.lock
+build/
+_native*.py
+*.so
+.pytest_cache

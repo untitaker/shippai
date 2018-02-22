@@ -1,0 +1,18 @@
+language: rust
+rust:
+  - stable
+  - nightly
+
+env:
+  - PYTHON_VERSION=2.7
+  - PYTHON_VERSION=3.6
+
+before_script:
+  - pyenv install -s $PYTHON_VERSION
+  - pyenv local $PYTHON_VERSION
+  - virtualenv ~/venv
+  - . ~/venv/bin/activate
+  - make install-dev
+
+script:
+  - make test
