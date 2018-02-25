@@ -27,5 +27,5 @@ matrix:
 cache:
   directories:
     - ~/.rustup/
-    ~ ~/.cache/pip/
-    ~ ~/.cargo/
+    - ~/.cache/pip/
+    - ~/.cargo/
