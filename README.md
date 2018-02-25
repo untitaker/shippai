@@ -1,4 +1,4 @@
-# shipppai
+# Shippai
 
 > failure in other languages
 
