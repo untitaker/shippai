@@ -23,6 +23,8 @@ matrix:
       env: PYTHON_VERSION=3.6
       before_script: make install-style
       script: make style
+  allow_failures:
+    - script: make style
 
 cache:
   directories:
