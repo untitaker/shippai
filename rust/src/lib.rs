@@ -1,5 +1,8 @@
-#[cfg(test)] #[macro_use] extern crate failure;
-#[cfg(not(test))] extern crate failure;
+#[cfg(test)]
+#[macro_use]
+extern crate failure;
+#[cfg(not(test))]
+extern crate failure;
 
 #[macro_export]
 macro_rules! shippai_export {
@@ -45,7 +48,8 @@ macro_rules! shippai_export {
         }
 
         #[no_mangle]
-        pub unsafe extern "C" fn shippai_get_cause_display(t: *mut ShippaiError) -> *const ::std::os::raw::c_char {
+        pub unsafe extern "C" fn shippai_get_cause_display(t: *mut ShippaiError)
+            -> *const ::std::os::raw::c_char {
             use ::std::ffi::CString;
             CString::new(format!("{}", (*t).error)).unwrap().into_raw()
         }
@@ -71,13 +75,13 @@ pub mod tests {
     #[derive(Debug, Fail)]
     enum MyError {
         #[fail(display = "Foo error")]
-        Foo
+        Foo,
     }
 
     #[derive(Debug, Fail)]
     enum MyOtherError {
         #[fail(display = "Bar error")]
-        Bar
+        Bar,
     }
 
     shippai_export!{
