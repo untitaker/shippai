@@ -23,6 +23,7 @@ macro_rules! shippai_export {
             }
         }
 
+        #[allow(unreachable_code)]
         #[no_mangle]
         pub unsafe extern "C" fn shippai_get_cause_name(t: *mut ShippaiError)
             -> *const ::std::os::raw::c_char {
