@@ -4,6 +4,10 @@
 
 typedef struct ShippaiError ShippaiError;
 
+/*
+ * The exported variant of `authenticate_impl`. The caller passes in a pointer to a nullpointer
+ * for `c_err`. If the inner pointer is still NULL after the call, the call succeeded.
+ */
 char *authenticate(const char *user, const char *pass, ShippaiError **c_err);
 
 void shippai_free_failure(ShippaiError *t);
@@ -15,3 +19,5 @@ const char *shippai_get_cause_display(ShippaiError *t);
 const char *shippai_get_cause_name(ShippaiError *t);
 
 const char *shippai_get_cause_names();
+
+const char *shippai_get_debug(ShippaiError *t);

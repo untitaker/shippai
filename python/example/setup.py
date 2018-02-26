@@ -2,14 +2,14 @@ from setuptools import setup, find_packages
 
 def build_native(spec):
     build = spec.add_external_build(
-        cmd=['cargo', 'build', '--release'],
+        cmd=['cargo', 'build'],  # you might want to adapt this line to use --release
         path='./rust/'
     )
 
     spec.add_cffi_module(
         module_path='shippai_example._native',
         dylib=lambda: build.find_dylib(
-            'shippai_example', in_path='target/release'),
+            'shippai_example', in_path='target/debug/'),  # also maybe use the release folder here
         header_filename='native.h',
         rtld_flags=['NODELETE']
     )

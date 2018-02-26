@@ -55,6 +55,13 @@ macro_rules! shippai_export {
         }
 
         #[no_mangle]
+        pub unsafe extern "C" fn shippai_get_debug(t: *mut ShippaiError)
+            -> *const ::std::os::raw::c_char {
+            use ::std::ffi::CString;
+            CString::new(format!("{:?}", (*t).error)).unwrap().into_raw()
+        }
+
+        #[no_mangle]
         pub unsafe extern "C" fn shippai_free_failure(t: *mut ShippaiError) {
             let _ = Box::from_raw(t);
         }
