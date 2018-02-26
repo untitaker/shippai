@@ -24,5 +24,6 @@ setup(
     license='MIT',
     classifiers=['License :: OSI Approved :: MIT License'],
     setup_requires=['milksnake'],
+    install_requires=['shippai'],
     milksnake_tasks=[build_native]
 )
