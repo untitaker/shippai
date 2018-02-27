@@ -52,21 +52,14 @@ Check out the [Python
 example](https://github.com/untitaker/shippai/tree/master/python/example) for a
 rough idea about how it all plays together.
 
-# Todo
+# Caveats
 
-Shippai is a work-in-progress, a lot of features are missing. Be aware of the following:
+Shippai is a work-in-progress, a lot of features are missing. (check the issue
+tracker)
 
-- Shippai does not have a result type.
-- Shippai parses the (string) debug output of failure to generate Python
-  stacktraces. That is not nice.
-- Shippai does not expose information about the cause of a failure.
-- Shippai cannot differentiate between enum variants of a fail (sometimes
-  called `ErrorKind`s), but only between the types that implement `Fail`.
-- `failure` itself is not stable yet, though [that will change
-  soon](https://boats.gitlab.io/blog/post/2018-02-22-failure-1.0/).
-- I have no idea what I am doing. If you see funny code here (particularly in
-  the FFI parts), don't assume it is because of a good reason. Tell me where I
-  am wrong.
+I also have no idea what I am doing. If you see funny code here (particularly
+in the FFI parts), don't assume it is because of a good reason. Tell me where I
+am wrong.
 
 # License
 
