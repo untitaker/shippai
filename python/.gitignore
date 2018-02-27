@@ -5,6 +5,7 @@ __pycache__
 */rust/target
 *.lock
 build/
+dist/
 _native*.py
 *.so
 .pytest_cache

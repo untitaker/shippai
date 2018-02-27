@@ -2,7 +2,9 @@
 
 > failure in other languages
 
-[![Build Status](https://travis-ci.org/untitaker/shippai.svg?branch=master)](https://travis-ci.org/untitaker/shippai)
+![Travis](https://img.shields.io/travis/untitaker/shippai.svg)
+![PyPI](https://img.shields.io/pypi/v/shippai.svg)
+![Crates.io](https://img.shields.io/crates/v/shippai.svg)
 
 Shippai is a set of libraries that help you with handling
 [failure](https://github.com/withoutboats/failure)-style errors from other
