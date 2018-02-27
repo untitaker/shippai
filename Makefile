@@ -24,3 +24,7 @@ style:
 	cd python/ && flake8
 	cd python/example/rust/ && cargo fmt
 	cd python/example/rust/ && cargo +nightly clippy
+
+release:
+	cd python/ && python setup.py sdist bdist_wheel upload
+	cd rust/ && cargo publish
