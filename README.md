@@ -2,9 +2,9 @@
 
 > failure in other languages
 
-![Travis](https://img.shields.io/travis/untitaker/shippai.svg)
-![PyPI](https://img.shields.io/pypi/v/shippai.svg)
-![Crates.io](https://img.shields.io/crates/v/shippai.svg)
+[![Travis](https://img.shields.io/travis/untitaker/shippai.svg)](https://travis-ci.org/untitaker/shippai)
+[![PyPI](https://img.shields.io/pypi/v/shippai.svg)](https://pypi.python.org/pypi/shippai/)
+[![Crates.io](https://img.shields.io/crates/v/shippai.svg)](https://crates.io/crates/shippai)
 
 Shippai is a set of libraries that help you with handling
 [failure](https://github.com/withoutboats/failure)-style errors from other
