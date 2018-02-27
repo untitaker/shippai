@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
 
+
 def build_native(spec):
     build = spec.add_external_build(
-        cmd=['cargo', 'build'],  # you might want to adapt this line to use --release
+        # you might want to adapt this line to use --release
+        cmd=['cargo', 'build'],
         path='./rust/'
     )
 
@@ -13,6 +15,7 @@ def build_native(spec):
         header_filename='native.h',
         rtld_flags=['NODELETE']
     )
+
 
 setup(
     name='shippai_example',

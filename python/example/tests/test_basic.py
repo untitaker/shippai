@@ -4,6 +4,7 @@ import pytest
 
 from textwrap import dedent
 
+
 def test_basic():
     with pytest.raises(shippai_example.errors.MyError) as exc:
         shippai_example.authenticate("hans gans", "password")

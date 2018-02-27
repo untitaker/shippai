@@ -12,19 +12,17 @@ before_script:
   - pyenv local $PYTHON_VERSION
   - virtualenv ~/venv
   - . ~/venv/bin/activate
-  - make install-dev
 
 script:
-  - make test
+  - make install-dev test
 
 matrix:
   include:
     - rust: nightly
       env: PYTHON_VERSION=3.6
-      before_script: make install-style
-      script: make style
+      script: make install-style style
   allow_failures:
-    - script: make style
+    - script: make install-style style
 
 cache:
   directories:

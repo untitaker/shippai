@@ -74,7 +74,8 @@ class Shippai(object):
             return
 
         rust_e = self._ffi.gc(rust_e, self._lib.shippai_free_failure)
-        rust_name = self._owned_string_rv(self._lib.shippai_get_cause_name(rust_e))
+        rust_name = self._owned_string_rv(
+            self._lib.shippai_get_cause_name(rust_e))
         exc_cls = self._exc_rust_names.get(rust_name, self.Unknown)
 
         display = self._owned_string_rv(
@@ -163,6 +164,7 @@ class _FailureDebugParser(object):
 
         self.output[-1].filename = filename
         self.output[-1].lineno = lineno
+
 
 def _raise_with_more_frames(exc, frames):
     frames = iter(frames)
