@@ -1,6 +1,5 @@
 import re
 import sys
-import traceback
 
 PY2 = sys.PY2 = sys.version_info[0] == 2
 
