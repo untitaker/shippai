@@ -34,9 +34,9 @@ macro_rules! shippai_export {
                 if (*t).error.downcast_ref::<$err>().is_some() {
                     return CString::new(stringify!($export_name)).unwrap().into_raw();
                 }
-
-                return ptr::null();
             )*
+
+            return ptr::null();
         }
 
         static SHIPPAI_CAUSE_NAMES: &'static str = concat!( $( stringify!($export_name), "," ),* );

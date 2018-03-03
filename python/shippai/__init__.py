@@ -63,6 +63,9 @@ class Shippai(object):
         self._exc_rust_names = exc_rust_names
 
     def _owned_string_rv(self, c_str):
+        if c_str == self._ffi.NULL:
+            return None
+
         try:
             return self._ffi.string(c_str).decode('utf-8')
         finally:
@@ -80,6 +83,9 @@ class Shippai(object):
         display = self._owned_string_rv(
             self._lib.shippai_get_cause_display(rust_e)
         )
+
+        if exc_cls is self.Unknown:
+            display = "{}: {}".format(rust_name, display)
 
         exc = exc_cls(display, failure=rust_e)
 
