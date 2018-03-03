@@ -1,10 +1,10 @@
-# Shippai in Rust
+# Shippai for Rust
 
-This is the part of shippai that deals with exporting failure/error type
-information.
+This crate is part of [Shippai](https://github.com/untitaker/shippai), a way to
+consume Rust errors in other languages.  It deals with exporting information
+about existing error types and provides FFI functions that code in other
+languages can use to handle Rust errors.
 
-It does so through a single macro that generates all types that e.g. the Python
-library needs. This is because [re-exporting the types of shippai in your own
+It does so through a single macro that generates all those symbols and
+functions. This is because [re-exporting the types of shippai in your own
 library would not always work](https://github.com/rust-lang/rust/issues/36342).
-
-Check out one of the full examples from the main README for usage.

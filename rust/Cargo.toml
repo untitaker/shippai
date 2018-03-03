@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "failure in other languages"
 authors = ["Markus Unterwaditzer <markus@unterwaditzer.net>"]
 license = "MIT"
+readme = "README.md"
 
 [dependencies]
 failure = "0.1"
