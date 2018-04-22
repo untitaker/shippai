@@ -3,17 +3,23 @@ extern crate failure;
 #[macro_use]
 extern crate shippai;
 
-use std::os::raw::c_char;
 use std::ffi::{CStr, CString};
+use std::os::raw::c_char;
 use std::ptr;
 
-#[derive(Debug, Fail)]
+// Shippai is not actually a trait. Deriving Shippai generates one function prefixed with
+// `shippai_` to be exported
+#[derive(Debug, Fail, Shippai)]
 pub enum MyError {
     #[fail(display = "Invalid username")]
     UserWrong,
     #[fail(display = "Invalid password")]
     PassWrong,
 }
+
+// generate a few functions for resource management (also prefixed with `shippai_`) and one type
+// `ShippaiError` that wraps `failure::Error`
+shippai_export!();
 
 /// The functionality we want to export
 fn authenticate_impl(user: Option<&str>, pass: Option<&str>) -> Result<String, failure::Error> {
@@ -26,28 +32,13 @@ fn authenticate_impl(user: Option<&str>, pass: Option<&str>) -> Result<String, f
     Ok(String::from("Hello world!"))
 }
 
-pub mod exports {
-    use super::*;
-    // The macro generates a few extern functions prefixed with `shippai_` and constants prefixed
-    // with `SHIPPAI_`. It also generates a public type `ShippaiError` which is a wrapper around
-    // `failure::Error` and can be converted from and into it.
-    shippai_export!{
-        // MyError is the type we want to export, and MY_ERROR is the name as which it should be
-        // visible through FFI. For now both are required to avoid confusion between `foo::Error`
-        // and `bar::Error`.
-        //
-        // The Python side will convert `MY_ERROR` back to `MyError` for idiomaticity.
-        MyError as MY_ERROR
-    }
-}
-
 /// The exported variant of `authenticate_impl`. The caller passes in a pointer to a nullpointer
 /// for `c_err`. If the inner pointer is still NULL after the call, the call succeeded.
 #[no_mangle]
 pub unsafe extern "C" fn authenticate(
     user: *const c_char,
     pass: *const c_char,
-    c_err: *mut *mut exports::ShippaiError,
+    c_err: *mut *mut ShippaiError,
 ) -> *mut c_char {
     let res = authenticate_impl(
         CStr::from_ptr(user).to_str().ok(),
@@ -64,7 +55,7 @@ pub unsafe extern "C" fn authenticate(
 /// This could be part of shippai itself sometime. Feedback welcome.
 unsafe fn export_result<V>(
     res: Result<V, failure::Error>,
-    c_err: *mut *mut exports::ShippaiError,
+    c_err: *mut *mut ShippaiError,
 ) -> Option<V> {
     match res {
         Ok(v) => Some(v),

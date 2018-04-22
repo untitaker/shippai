@@ -11,7 +11,8 @@ def build_native(spec):
     spec.add_cffi_module(
         module_path='shippai_example._native',
         dylib=lambda: build.find_dylib(
-            'shippai_example', in_path='target/debug/'),  # also maybe use the release folder here
+            # also maybe use the release folder here
+            'shippai_example', in_path='target/debug/'),
         header_filename='native.h',
         rtld_flags=['NODELETE']
     )

@@ -1,0 +1,14 @@
+[package]
+name = "shippai_derive"
+description = "macros for shippai"
+version = "0.2.0"
+authors = ["Markus Unterwaditzer <markus@unterwaditzer.net>"]
+license = "MIT"
+
+[dependencies]
+syn = "0.13"
+quote = "0.5"
+proc-macro2 = "0.3"
+
+[lib]
+proc-macro = true

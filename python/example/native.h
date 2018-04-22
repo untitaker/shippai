@@ -14,10 +14,8 @@ void shippai_free_failure(ShippaiError *t);
 
 void shippai_free_str(char *t);
 
-const char *shippai_get_cause_display(ShippaiError *t);
-
-const char *shippai_get_cause_name(ShippaiError *t);
-
-const char *shippai_get_cause_names();
-
 const char *shippai_get_debug(ShippaiError *t);
+
+const char *shippai_get_display(ShippaiError *t);
+
+bool shippai_is_error_MyError(ShippaiError *t);
