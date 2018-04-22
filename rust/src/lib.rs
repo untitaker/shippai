@@ -1,17 +1,18 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
+
 #[macro_use]
 extern crate failure;
 
-#[allow(unused_imports)]
 #[macro_use]
 extern crate shippai_derive;
+
 pub use shippai_derive::*;
 
 #[macro_export]
 macro_rules! shippai_export {
     () => {
         pub struct ShippaiError {
-            error: ::failure::Error
+            error: ::failure::Error,
         }
 
         impl From<::failure::Error> for ShippaiError {
@@ -27,17 +28,21 @@ macro_rules! shippai_export {
         }
 
         #[no_mangle]
-        pub unsafe extern "C" fn shippai_get_display(t: *mut ShippaiError)
-            -> *const ::std::os::raw::c_char {
-            use ::std::ffi::CString;
+        pub unsafe extern "C" fn shippai_get_display(
+            t: *mut ShippaiError,
+        ) -> *const ::std::os::raw::c_char {
+            use std::ffi::CString;
             CString::new(format!("{}", (*t).error)).unwrap().into_raw()
         }
 
         #[no_mangle]
-        pub unsafe extern "C" fn shippai_get_debug(t: *mut ShippaiError)
-            -> *const ::std::os::raw::c_char {
-            use ::std::ffi::CString;
-            CString::new(format!("{:?}", (*t).error)).unwrap().into_raw()
+        pub unsafe extern "C" fn shippai_get_debug(
+            t: *mut ShippaiError,
+        ) -> *const ::std::os::raw::c_char {
+            use std::ffi::CString;
+            CString::new(format!("{:?}", (*t).error))
+                .unwrap()
+                .into_raw()
         }
 
         #[no_mangle]
@@ -47,11 +52,10 @@ macro_rules! shippai_export {
 
         #[no_mangle]
         pub unsafe extern "C" fn shippai_free_str(t: *mut ::std::os::raw::c_char) {
-            use ::std::ffi::CString;
+            use std::ffi::CString;
             CString::from_raw(t);
         }
-    }
-
+    };
 }
 
 #[cfg(test)]
@@ -69,6 +73,6 @@ pub mod tests {
         #[fail(display = "Bar error")]
         Bar,
     }
-    
+
     shippai_export!();
 }

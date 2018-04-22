@@ -3,8 +3,8 @@ extern crate failure;
 #[macro_use]
 extern crate shippai;
 
-use std::os::raw::c_char;
 use std::ffi::{CStr, CString};
+use std::os::raw::c_char;
 use std::ptr;
 
 // Shippai is not actually a trait. Deriving Shippai generates one function prefixed with
