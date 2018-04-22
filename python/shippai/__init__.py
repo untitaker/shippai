@@ -11,14 +11,15 @@ class ShippaiException(Exception):
 
 
 class Shippai(object):
-    __slots__ = ('_ffi', '_lib', '_exc_names', '_filter_frames', 'Base',
-                 'Unknown')
+    __slots__ = ('_ffi', '_lib', '_exc_names', '_filter_frames',
+                 '_rust_basepath', 'Base', 'Unknown')
 
     def __init__(self, ffi, lib, exception_baseclass=ShippaiException,
-                 filter_frames=True):
+                 filter_frames=True, rust_basepath=None):
         self._ffi = ffi
         self._lib = lib
         self._filter_frames = filter_frames
+        self._rust_basepath = rust_basepath.rstrip('/') + '/'
         self.Base = exception_baseclass
 
         self._generate_exceptions()
@@ -84,6 +85,13 @@ class Shippai(object):
             frames = _FailureDebugParser(debug).parse()
             if self._filter_frames:
                 frames = _filter_frames(frames)
+            if self._rust_basepath:
+                frames = (
+                    _RustFrame(filename=self._rust_basepath + f.filename,
+                               lineno=f.lineno,
+                               funcname=f.funcname)
+                    for f in frames
+                )
             _raise_with_more_frames(exc, frames)
         except exc_cls:
             raise

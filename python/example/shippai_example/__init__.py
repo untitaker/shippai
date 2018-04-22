@@ -1,7 +1,14 @@
+import os
+
 from ._native import ffi, lib
 from shippai import Shippai
 
-errors = Shippai(ffi, lib)
+rust_basepath = os.path.normpath(os.path.join(
+    os.path.dirname(__file__),
+    '../rust/'
+))
+
+errors = Shippai(ffi, lib, rust_basepath=rust_basepath)
 
 
 def authenticate(user, password):
