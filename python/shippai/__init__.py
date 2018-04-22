@@ -10,57 +10,46 @@ class ShippaiException(Exception):
         Exception.__init__(self, msg)
 
 
-def _normalize_exception_name(name):
-    return name.title().replace('_', '')
-
-
 class Shippai(object):
-    __slots__ = ('_ffi', '_lib', '_exc_python_names', '_exc_rust_names',
-                 '_filter_frames')
+    __slots__ = ('_ffi', '_lib', '_exc_names', '_filter_frames', 'Base',
+                 'Unknown')
 
     def __init__(self, ffi, lib, exception_baseclass=ShippaiException,
                  filter_frames=True):
         self._ffi = ffi
         self._lib = lib
         self._filter_frames = filter_frames
-        self._generate_exceptions(exception_baseclass)
+        self.Base = exception_baseclass
 
-    def _generate_exceptions(self, baseclass):
+        self._generate_exceptions()
+
+    def _generate_exceptions(self):
         try:
-            cause_names = self._lib.shippai_get_cause_names()
+            self._lib.shippai_free_str
         except AttributeError:
             raise RuntimeError('Given library does not export shippai.')
 
-        cause_names = self._ffi.string(cause_names)
-        if not PY2:
-            cause_names = cause_names.decode('utf-8')
-        cause_names = cause_names.split(',')
-
-        exc_python_names = {}
-        exc_rust_names = {}
-
-        exc_python_names['Base'] = baseclass
-
-        class Unknown(baseclass):
+        class Unknown(self.Base):
             pass
 
-        exc_python_names['Unknown'] = Unknown
+        self.Unknown = Unknown
+        exc_names = {}
 
-        for rust_name in cause_names:
-            if not rust_name or rust_name in exc_rust_names:
+        for name in dir(self._lib):
+            if not name.startswith('shippai_is_error_'):
                 continue
+            name = name[len('shippai_is_error_'):]
 
-            name = _normalize_exception_name(rust_name)
+            if not name or name in exc_names:
+                continue
 
             class Exc(ShippaiException):
                 pass
 
             Exc.__name__ = name
-            exc_python_names[name] = Exc
-            exc_rust_names[rust_name] = Exc
+            exc_names[name] = Exc
 
-        self._exc_python_names = exc_python_names
-        self._exc_rust_names = exc_rust_names
+        self._exc_names = exc_names
 
     def _owned_string_rv(self, c_str):
         if c_str == self._ffi.NULL:
@@ -71,21 +60,22 @@ class Shippai(object):
         finally:
             self._lib.shippai_free_str(c_str)
 
+    def get_exc_cls(self, rust_e):
+        for name, cls in self._exc_names.items():
+            if getattr(self._lib, 'shippai_is_error_{}'.format(name))(rust_e):
+                return cls
+        return self.Unknown
+
     def check_exception(self, rust_e):
         if rust_e == self._ffi.NULL:
             return
 
         rust_e = self._ffi.gc(rust_e, self._lib.shippai_free_failure)
-        rust_name = self._owned_string_rv(
-            self._lib.shippai_get_cause_name(rust_e))
-        exc_cls = self._exc_rust_names.get(rust_name, self.Unknown)
+        exc_cls = self.get_exc_cls(rust_e)
 
         display = self._owned_string_rv(
-            self._lib.shippai_get_cause_display(rust_e)
+            self._lib.shippai_get_display(rust_e)
         )
-
-        if exc_cls is self.Unknown:
-            display = "{}: {}".format(rust_name, display)
 
         exc = exc_cls(display, failure=rust_e)
 
@@ -102,7 +92,7 @@ class Shippai(object):
 
     def __getattr__(self, name):
         try:
-            return self._exc_python_names[name]
+            return self._exc_names[name]
         except KeyError:
             raise AttributeError(name)
 
