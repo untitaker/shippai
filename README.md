@@ -13,7 +13,7 @@ languages
 Right now this project consists of:
 
 - A [Rust library](https://github.com/untitaker/shippai/tree/master/rust) to
-  generate a FFI for a given list of `T: Fail` via a macro.
+  generate FFI code for your `Fail` types.
 - A [Python library](https://github.com/untitaker/shippai/tree/master/python)
   to:
 
@@ -22,6 +22,10 @@ Right now this project consists of:
      exception and raise them together with a complete stacktrace
 
 # Examples
+
+Check out the [Python
+example](https://github.com/untitaker/shippai/tree/master/python/example) for a
+rough idea of how it all plays together. Here is how a stacktrace looks like:
 
 ```
 $ RUST_BACKTRACE=1 python
@@ -47,10 +51,6 @@ Traceback (most recent call last):
 shippai.MyError: Invalid username
 >>> 
 ```
-
-Check out the [Python
-example](https://github.com/untitaker/shippai/tree/master/python/example) for a
-rough idea about how it all plays together.
 
 # Caveats
 
