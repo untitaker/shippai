@@ -27,4 +27,5 @@ style:
 
 release:
 	cd python/ && python setup.py sdist bdist_wheel upload
+	cd rust/shippai_derive/ && cargo publish
 	cd rust/ && cargo publish
