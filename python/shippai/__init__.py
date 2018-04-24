@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 
@@ -42,6 +43,7 @@ class Shippai(object):
         def new_error(name):
             if name in errors:
                 return
+
             class Exc(ShippaiException):
                 pass
             Exc.__name__ = name
@@ -50,6 +52,7 @@ class Shippai(object):
         def new_variant(error_name, variant_name, discriminant):
             error, variants = errors[error_name]
             assert discriminant not in variants
+
             class Exc(error):
                 pass
             Exc.__name__ = variant_name
@@ -105,20 +108,26 @@ class Shippai(object):
         try:
             debug = self._owned_string_rv(self._lib.shippai_get_debug(rust_e))
             frames = _FailureDebugParser(debug).parse()
-            if self._filter_frames:
-                frames = _filter_frames(frames)
-            if self._rust_basepath:
-                frames = (
-                    _RustFrame(filename=self._rust_basepath + f.filename,
-                               lineno=f.lineno,
-                               funcname=f.funcname)
-                    for f in frames
-                )
+            frames = self._process_frames(frames)
             _raise_with_more_frames(exc, frames)
         except exc_cls:
             raise
         except Exception:
             raise exc
+
+    def _process_frames(self, frames):
+        if self._filter_frames:
+            frames = _filter_frames(frames)
+        if self._rust_basepath:
+            frames = (
+                _RustFrame(
+                    filename=os.path.join(self._rust_basepath, f.filename),
+                    lineno=f.lineno,
+                    funcname=f.funcname
+                )
+                for f in frames
+            )
+        return frames
 
     def __getattr__(self, name):
         try:
