@@ -19,7 +19,10 @@ class Shippai(object):
         self._ffi = ffi
         self._lib = lib
         self._filter_frames = filter_frames
-        self._rust_basepath = rust_basepath.rstrip('/') + '/'
+        if rust_basepath:
+            self._rust_basepath = rust_basepath.rstrip('/') + '/'
+        else:
+            self._rust_basepath = None
         self.Base = exception_baseclass
 
         self._generate_exceptions()
