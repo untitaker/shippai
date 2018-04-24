@@ -11,7 +11,7 @@ class ShippaiException(Exception):
 
 
 class Shippai(object):
-    __slots__ = ('_ffi', '_lib', '_exc_names', '_filter_frames',
+    __slots__ = ('_ffi', '_lib', '_errors', '_filter_frames',
                  '_rust_basepath', 'Base', 'Unknown')
 
     def __init__(self, ffi, lib, exception_baseclass=ShippaiException,
@@ -37,23 +37,35 @@ class Shippai(object):
             pass
 
         self.Unknown = Unknown
-        exc_names = {}
+        errors = {}
 
-        for name in dir(self._lib):
-            if not name.startswith('shippai_is_error_'):
-                continue
-            name = name[len('shippai_is_error_'):]
-
-            if not name or name in exc_names:
-                continue
-
+        def new_error(name):
+            if name in errors:
+                return
             class Exc(ShippaiException):
                 pass
-
             Exc.__name__ = name
-            exc_names[name] = Exc
+            errors[name] = (Exc, {})
 
-        self._exc_names = exc_names
+        def new_variant(error_name, variant_name, discriminant):
+            error, variants = errors[error_name]
+            assert discriminant not in variants
+            class Exc(error):
+                pass
+            Exc.__name__ = variant_name
+            setattr(error, variant_name, Exc)
+            variants[discriminant] = Exc
+
+        for name in dir(self._lib):
+            if name.startswith('shippai_is_error_'):
+                new_error(name[len('shippai_is_error_'):])
+            elif name.startswith('SHIPPAI_VARIANT_'):
+                _, _, error_name, variant_name = name.split('_')
+                new_error(error_name)
+                discriminant = getattr(self._lib, name)
+                new_variant(error_name, variant_name, discriminant)
+
+        self._errors = errors
 
     def _owned_string_rv(self, c_str):
         if c_str == self._ffi.NULL:
@@ -64,18 +76,25 @@ class Shippai(object):
         finally:
             self._lib.shippai_free_str(c_str)
 
-    def get_exc_cls(self, rust_e):
-        for name, cls in self._exc_names.items():
+    def get_error(self, rust_e):
+        for name, (cls, variants) in self._errors.items():
             if getattr(self._lib, 'shippai_is_error_{}'.format(name))(rust_e):
-                return cls
+                return self._get_variant(rust_e, name, cls, variants)
         return self.Unknown
+
+    def _get_variant(self, rust_e, error_name, error_cls, variants):
+        discriminant = getattr(
+            self._lib,
+            'shippai_get_variant_{}'.format(error_name)
+        )(rust_e)
+        return variants.get(discriminant, error_cls)
 
     def check_exception(self, rust_e):
         if rust_e == self._ffi.NULL:
             return
 
         rust_e = self._ffi.gc(rust_e, self._lib.shippai_free_failure)
-        exc_cls = self.get_exc_cls(rust_e)
+        exc_cls = self.get_error(rust_e)
 
         display = self._owned_string_rv(
             self._lib.shippai_get_display(rust_e)
@@ -103,7 +122,7 @@ class Shippai(object):
 
     def __getattr__(self, name):
         try:
-            return self._exc_names[name]
+            return self._errors[name][0]
         except KeyError:
             raise AttributeError(name)
 
