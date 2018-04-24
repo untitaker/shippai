@@ -57,22 +57,3 @@ macro_rules! shippai_export {
         }
     };
 }
-
-#[cfg(test)]
-pub mod tests {
-    use super::*;
-
-    #[derive(Debug, Fail, Shippai)]
-    enum MyError {
-        #[fail(display = "Foo error")]
-        Foo,
-    }
-
-    #[derive(Debug, Fail, Shippai)]
-    enum MyOtherError {
-        #[fail(display = "Bar error")]
-        Bar,
-    }
-
-    shippai_export!();
-}
