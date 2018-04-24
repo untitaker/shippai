@@ -6,6 +6,8 @@ authors = ["Markus Unterwaditzer <markus@unterwaditzer.net>"]
 license = "MIT"
 readme = "README.md"
 
+repository = "https://github.com/untitaker/shippai"
+
 [dependencies]
 failure = "0.1"
 
