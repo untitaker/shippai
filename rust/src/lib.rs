@@ -12,7 +12,7 @@ pub use shippai_derive::*;
 macro_rules! shippai_export {
     () => {
         pub struct ShippaiError {
-            error: ::failure::Error,
+            pub error: ::failure::Error,
         }
 
         impl From<::failure::Error> for ShippaiError {
