@@ -24,7 +24,7 @@ Right now this project consists of:
 # Examples
 
 Check out the [Python
-example](https://github.com/untitaker/shippai/tree/master/python/example) for a
+example](https://github.com/untitaker/shippai/tree/master/examples/python) for a
 rough idea of how it all plays together. Here is how a stacktrace looks like:
 
 ```
@@ -36,17 +36,17 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> shippai_example.authenticate('', '')
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
-  File "/home/untitaker/projects/shippai/python/example/shippai_example/__init__.py", line 17, in authenticate
+  File "/home/untitaker/projects/shippai/examples/python/shippai_example/__init__.py", line 17, in authenticate
     errors.check_exception(err[0])
   File "/home/untitaker/projects/shippai/python/shippai/__init__.py", line 110, in check_exception
     _raise_with_more_frames(exc, frames)
   File "/home/untitaker/projects/shippai/python/shippai/__init__.py", line 228, in _raise_with_more_frames
     func()
-  File "/home/untitaker/projects/shippai/python/example/rust/c/_cffi_backend.c", line 3025, in cdata_call
-  File "/home/untitaker/projects/shippai/python/example/rust/../src/x86/ffi64.c", line 525, in ffi_call
-  File "/home/untitaker/projects/shippai/python/example/rust/src/lib.rs", line 43, in authenticate
+  File "/home/untitaker/projects/shippai/examples/python/rust/c/_cffi_backend.c", line 3025, in cdata_call
+  File "/home/untitaker/projects/shippai/examples/python/rust/../src/x86/ffi64.c", line 525, in ffi_call
+  File "/home/untitaker/projects/shippai/examples/python/rust/src/lib.rs", line 43, in authenticate
     let res = authenticate_impl(
-  File "/home/untitaker/projects/shippai/python/example/rust/src/lib.rs", line 27, in shippai_example__authenticate_impl__h040a48b77826a8f4
+  File "/home/untitaker/projects/shippai/examples/python/rust/src/lib.rs", line 27, in shippai_example__authenticate_impl__h040a48b77826a8f4
     return Err(MyError::UserWrong.into());
 [...]
 shippai.UserWrong: Invalid username

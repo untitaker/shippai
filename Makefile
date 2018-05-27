@@ -3,9 +3,9 @@
 export RUST_BACKTRACE := 1
 
 install-dev:
-	cd rust/ && cargo build --release
+	cd rust/ && cargo build
 	cd python/ && pip install -e .
-	cd python/example/ && $(MAKE) install-dev
+	cd examples/python/ && $(MAKE) install-dev
 
 install-style:
 	which cargo-install-update || cargo install cargo-update
@@ -16,14 +16,14 @@ install-style:
 
 test:
 	cd rust/ && cargo test
-	cd python/example/ && $(MAKE) test
+	cd examples/python/ && $(MAKE) test
 
 style:
 	cd rust/ && cargo +nightly clippy
 	cd rust/ && cargo fmt
 	cd python/ && flake8
-	cd python/example/rust/ && cargo fmt
-	cd python/example/rust/ && cargo +nightly clippy
+	cd examples/python/rust/ && cargo fmt
+	cd examples/python/rust/ && cargo +nightly clippy
 
 release:
 	cd python/ && python setup.py sdist bdist_wheel upload
