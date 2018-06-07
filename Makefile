@@ -1,7 +1,5 @@
 .PHONY: test
 
-export RUST_BACKTRACE := 1
-
 install-dev:
 	cd rust/ && cargo build
 	cd python/ && pip install -e .

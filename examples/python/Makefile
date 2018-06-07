@@ -1,5 +1,7 @@
 .PHONY: native.h install-dev test
 
+export RUST_BACKTRACE := 1
+
 native.h:
 	cbindgen -c cbindgen.toml rust/ > $@
 
