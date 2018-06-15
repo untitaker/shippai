@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+typedef struct MyError MyError;
+
 typedef struct ShippaiError ShippaiError;
 
 extern const uint8_t SHIPPAI_VARIANT_MyError_PassWrong;
@@ -14,6 +16,8 @@ extern const uint8_t SHIPPAI_VARIANT_MyError_UserWrong;
  */
 char *authenticate(const char *user, const char *pass, ShippaiError **c_err);
 
+const MyError *shippai_cast_error_MyError(const ShippaiError *t);
+
 void shippai_free_failure(ShippaiError *t);
 
 void shippai_free_str(char *t);
@@ -22,6 +26,4 @@ const char *shippai_get_debug(ShippaiError *t);
 
 const char *shippai_get_display(ShippaiError *t);
 
-uint8_t shippai_get_variant_MyError(ShippaiError *t);
-
-bool shippai_is_error_MyError(ShippaiError *t);
+uint8_t shippai_get_variant_MyError(const MyError *f);

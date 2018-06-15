@@ -15,16 +15,17 @@ pub fn shippai(input: TokenStream) -> TokenStream {
 
 fn impl_shippai(ast: &syn::DeriveInput) -> quote::Tokens {
     let error_name = &ast.ident;
-    let fn_name = syn::Ident::from(format!("shippai_is_error_{}", error_name));
+    let fn_name = syn::Ident::from(format!("shippai_cast_error_{}", error_name));
 
     let variant_helpers = impl_enums(error_name, ast);
 
     quote! {
         #[no_mangle]
-        pub unsafe extern "C" fn #fn_name(t: *mut ShippaiError) -> bool {
+        pub unsafe extern "C" fn #fn_name(t: *const ShippaiError) -> *const #error_name {
             (*t).error
                 .downcast_ref::<#error_name>()
-                .is_some()
+                .map(|x| x as *const #error_name)
+                .unwrap_or_else(::std::ptr::null)
         }
 
         #( #variant_helpers )*
@@ -59,14 +60,10 @@ fn impl_enums(error_name: &syn::Ident, ast: &syn::DeriveInput) -> Option<quote::
         )*
 
         #[no_mangle]
-        pub unsafe extern "C" fn #fn_name(t: *mut ShippaiError) -> u8 {
-            if let Some(f) = (*t).error.downcast_ref::<#error_name>() {
-                match *f {
-                    #match_arms
-                }
+        pub unsafe extern "C" fn #fn_name(f: *const #error_name) -> u8 {
+            match *f {
+                #match_arms
             }
-
-            0
         }
     })
 }

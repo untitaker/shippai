@@ -2,13 +2,35 @@ import os
 import re
 import sys
 
-PY2 = sys.PY2 = sys.version_info[0] == 2
-
 
 class ShippaiException(Exception):
+    _variants = None
+    _parent = None
+
     def __init__(self, msg, failure):
         self.failure = failure
         Exception.__init__(self, msg)
+
+    @classmethod
+    def _new_variant(cls, variant_name, discriminant):
+        if cls is ShippaiException:
+            raise RuntimeError('Baseclass cannot have variants')
+        if cls._parent is not None:
+            raise RuntimeError('Variant cannot have additional variants')
+
+        if cls._variants is None:
+            cls._variants = {}
+
+        assert discriminant not in cls._variants
+
+        class Exc(cls):
+            _variants = None
+            _parent = cls
+
+        Exc.__name__ = variant_name
+
+        setattr(cls, variant_name, Exc)
+        cls._variants[discriminant] = Exc
 
 
 class Shippai(object):
@@ -42,31 +64,22 @@ class Shippai(object):
 
         def new_error(name):
             if name in errors:
-                return
+                return errors[name]
 
             class Exc(ShippaiException):
                 pass
             Exc.__name__ = name
-            errors[name] = (Exc, {})
-
-        def new_variant(error_name, variant_name, discriminant):
-            error, variants = errors[error_name]
-            assert discriminant not in variants
-
-            class Exc(error):
-                pass
-            Exc.__name__ = variant_name
-            setattr(error, variant_name, Exc)
-            variants[discriminant] = Exc
+            errors[name] = Exc
+            return Exc
 
         for name in dir(self._lib):
             if name.startswith('shippai_is_error_'):
                 new_error(name[len('shippai_is_error_'):])
             elif name.startswith('SHIPPAI_VARIANT_'):
                 _, _, error_name, variant_name = name.split('_')
-                new_error(error_name)
+                Exc = new_error(error_name)
                 discriminant = getattr(self._lib, name)
-                new_variant(error_name, variant_name, discriminant)
+                Exc._new_variant(variant_name, discriminant)
 
         self._errors = errors
 
@@ -79,18 +92,31 @@ class Shippai(object):
         finally:
             self._lib.shippai_free_str(c_str)
 
-    def get_error(self, rust_e):
-        for name, (cls, variants) in self._errors.items():
-            if getattr(self._lib, 'shippai_is_error_{}'.format(name))(rust_e):
-                return self._get_variant(rust_e, name, cls, variants)
+    def get_error(self, rust_error):
+        for name, error_cls in self._errors.items():
+            rust_fail = getattr(
+                self._lib,
+                'shippai_cast_error_{}'.format(name)
+            )(rust_error)
+            if rust_fail != self._ffi.NULL:
+                return self._get_variant(error_cls, rust_fail)
         return self.Unknown
 
-    def _get_variant(self, rust_e, error_name, error_cls, variants):
-        discriminant = getattr(
+    def _get_variant(self, error_cls, rust_fail):
+        if error_cls._variants is None:
+            return error_cls
+
+        rust_get_variant = getattr(
             self._lib,
-            'shippai_get_variant_{}'.format(error_name)
-        )(rust_e)
-        return variants.get(discriminant, error_cls)
+            'shippai_get_variant_{}'.format(error_cls.__name__),
+            None
+        )
+
+        if rust_get_variant is None:
+            return error_cls
+
+        discriminant = rust_get_variant(rust_fail)
+        return error_cls._variants.get(discriminant, error_cls)
 
     def check_exception(self, rust_e):
         if rust_e == self._ffi.NULL:
@@ -131,7 +157,7 @@ class Shippai(object):
 
     def __getattr__(self, name):
         try:
-            return self._errors[name][0]
+            return self._errors[name]
         except KeyError:
             raise AttributeError(name)
 
