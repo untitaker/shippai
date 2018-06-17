@@ -119,6 +119,8 @@ class Shippai(object):
         return error_cls._variants.get(discriminant, error_cls)
 
     def check_exception(self, rust_e):
+        __tracebackhide__ = True
+
         if rust_e == self._ffi.NULL:
             return
 
@@ -240,6 +242,8 @@ class _FailureDebugParser(object):
 
 
 def _raise_with_more_frames(exc, frames):
+    __tracebackhide__ = True
+
     frames = iter(frames)
 
     frame = next(frames, None)
