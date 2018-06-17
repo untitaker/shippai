@@ -143,7 +143,11 @@ class Shippai(object):
 
     def _process_frames(self, frames):
         if self._filter_frames:
-            frames = _filter_frames(frames)
+            if callable(self._filter_frames):
+                frames = self._filter_frames(frames)
+            else:
+                frames = _basic_filter_frames(frames)
+
         if self._rust_basepath:
             frames = (
                 _RustFrame(
@@ -176,10 +180,19 @@ class _RustFrame(object):
     def safe_filename(self):
         return self.filename or '???'
 
+    def guess_crate_name(self):
+        for match in re.finditer(r"\.cargo/registry/src/[^/]+/([^/]+)/",
+                                 self.filename):
+            return match.group(1).rsplit('-', 1)[0]
 
-def _filter_frames(frames):
+
+def _basic_filter_frames(frames):
     for frame in frames:
         if not frame.filename:
+            continue
+        if frame.filename.endswith('.c'):
+            continue
+        if frame.guess_crate_name() in ('failure', 'backtrace'):
             continue
         yield frame
 
