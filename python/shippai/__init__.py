@@ -176,9 +176,9 @@ class _RustFrame(object):
     __slots__ = ('filename', 'lineno', 'funcname')
 
     def __init__(self, filename, lineno, funcname):
-        self.filename = str(filename)
+        self.filename = str(filename or "")
         self.lineno = lineno
-        self.funcname = str(funcname)
+        self.funcname = str(funcname or "")
 
     def guess_crate_name(self):
         for match in re.finditer(r"\.cargo/registry/src/[^/]+/([^/]+)/",
