@@ -28,27 +28,28 @@ example](https://github.com/untitaker/shippai/tree/master/examples/python) for a
 rough idea of how it all plays together. Here is how a stacktrace looks like:
 
 ```
+$ make install-dev
 $ RUST_BACKTRACE=1 python
-Python 3.6.5 (default, Apr 12 2018, 22:45:43) 
-[GCC 7.3.1 20180312] on linux
+Python 3.6.5 (default, May 11 2018, 04:00:52)
+[GCC 8.1.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import shippai_example
 >>> shippai_example.authenticate('', '')
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
-  File "/home/untitaker/projects/shippai/examples/python/shippai_example/__init__.py", line 17, in authenticate
+  File "/home/untitaker/projects/shippai/examples/python/shippai_example/__init__.py", line 25, in authenticate
     errors.check_exception(err[0])
-  File "/home/untitaker/projects/shippai/python/shippai/__init__.py", line 110, in check_exception
+  File "/home/untitaker/projects/shippai/python/shippai/__init__.py", line 144, in check_exception
     _raise_with_more_frames(exc, frames)
-  File "/home/untitaker/projects/shippai/python/shippai/__init__.py", line 228, in _raise_with_more_frames
-    func()
-  File "/home/untitaker/projects/shippai/examples/python/rust/c/_cffi_backend.c", line 3025, in cdata_call
-  File "/home/untitaker/projects/shippai/examples/python/rust/../src/x86/ffi64.c", line 525, in ffi_call
+  File "/home/untitaker/projects/shippai/python/shippai/__init__.py", line 262, in _raise_with_more_frames
+    _append_frame(exc_info, frames[-1])
+  File "/home/untitaker/projects/shippai/python/shippai/__init__.py", line 296, in _append_frame
+    exec(code, ns)
   File "/home/untitaker/projects/shippai/examples/python/rust/src/lib.rs", line 43, in authenticate
     let res = authenticate_impl(
-  File "/home/untitaker/projects/shippai/examples/python/rust/src/lib.rs", line 27, in shippai_example__authenticate_impl__h040a48b77826a8f4
+  File "/home/untitaker/projects/shippai/examples/python/rust/src/lib.rs", line 27, in shippai_example::authenticate_impl::he2a2e071e069a869
     return Err(MyError::UserWrong.into());
-[...]
+  File "/checkout/src/libcore/convert.rs", line 396, in <T as core::convert::Into<U>>::into::hda623f1239c06654
 shippai.UserWrong: Invalid username
 >>> 
 ```

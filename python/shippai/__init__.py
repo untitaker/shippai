@@ -1,5 +1,10 @@
 import os
 import re
+import sys
+
+from types import CodeType
+
+PY2 = sys.version_info[0] == 2
 
 
 class ShippaiException(Exception):
@@ -171,15 +176,9 @@ class _RustFrame(object):
     __slots__ = ('filename', 'lineno', 'funcname')
 
     def __init__(self, filename, lineno, funcname):
-        self.filename = filename
+        self.filename = str(filename)
         self.lineno = lineno
-        self.funcname = funcname
-
-    def safe_funcname(self):
-        return re.sub('[^0-9a-zA-Z_]', '_', self.funcname)
-
-    def safe_filename(self):
-        return self.filename or '???'
+        self.funcname = str(funcname)
 
     def guess_crate_name(self):
         for match in re.finditer(r"\.cargo/registry/src/[^/]+/([^/]+)/",
@@ -243,30 +242,51 @@ class _FailureDebugParser(object):
 def _raise_with_more_frames(exc, frames):
     __tracebackhide__ = True
 
-    frames = iter(frames)
+    frames = list(frames)
+    exc_info = type(exc), exc, None
 
-    frame = next(frames, None)
-    if frame is None:
-        raise exc
+    for frame in frames[:-1]:
+        try:
+            _append_frame(exc_info, frame)
+        except BaseException:
+            exc_info = sys.exc_info()
+            exc_info = exc_info[0], exc_info[1], exc_info[2].tb_next.tb_next
+
+    _append_frame(exc_info, frames[-1])
+
+
+if PY2:
+    # single exec misses a frame, wrap in another exec to actually append frame
+    RERAISE_CODE = (
+        'exec("raise _shippai_exc_info[0], _shippai_exc_info[1], '
+        '_shippai_exc_info[2]")'
+    )
+else:
+    RERAISE_CODE = (
+        'raise _shippai_exc_info[1].with_traceback(_shippai_exc_info[2])'
+    )
+
+
+def _append_frame(exc_info, frame):
+    __tracebackhide__ = True
 
     code = '\n' * ((frame.lineno or 1) - 1)
-    code += 'def {}(): raise _shippai_fake'.format(frame.safe_funcname())
-    code = compile(code, frame.safe_filename(), 'exec')
-    ns = dict(_shippai_fake=exc)
+    code += RERAISE_CODE
+    code = compile(code, frame.filename, 'exec')
+
+    if PY2:
+        code = CodeType(0, code.co_nlocals, code.co_stacksize,
+                        code.co_flags, code.co_code, code.co_consts,
+                        code.co_names, code.co_varnames, frame.filename,
+                        frame.funcname, code.co_firstlineno,
+                        code.co_lnotab, (), ())
+    else:
+        code = CodeType(0, code.co_kwonlyargcount,
+                        code.co_nlocals, code.co_stacksize,
+                        code.co_flags, code.co_code, code.co_consts,
+                        code.co_names, code.co_varnames, frame.filename,
+                        frame.funcname, code.co_firstlineno,
+                        code.co_lnotab, (), ())
+
+    ns = dict(_shippai_exc_info=exc_info)
     exec(code, ns)
-    func = ns[frame.safe_funcname()]
-
-    for frame in frames:
-        code = '\n' * ((frame.lineno or 1) - 1)
-        if frame.funcname == '<lambda>':
-            code += '_shippai_new_fake = lambda: _shippai_fake()'
-            funcname = '_shippai_new_fake'
-        else:
-            code += 'def {}(): _shippai_fake()'.format(frame.safe_funcname())
-            funcname = frame.safe_funcname()
-        code = compile(code, frame.safe_filename(), 'exec')
-        ns = dict(_shippai_fake=func)
-        exec(code, ns)
-        func = ns[funcname]
-
-    func()

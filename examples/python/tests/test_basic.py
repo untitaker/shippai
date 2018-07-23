@@ -9,8 +9,8 @@ def test_basic():
     assert 'Invalid username' in str(exc.value)
     tb = ''.join(traceback.format_tb(exc.tb))
     assert '.rs' in tb
-    assert 'in failure__backtrace__Backtrace__new__' not in tb
-    assert 'in backtrace__capture__' not in tb
+    assert 'in failure' not in tb
+    assert 'in backtrace' not in tb
     assert 'in authenticate\n' in tb
 
     with pytest.raises(shippai_example.errors.MyError.PassWrong) as exc:
