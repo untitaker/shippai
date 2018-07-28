@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='shippai',
-    version='0.3.0',
+    version='0.3.1',
     description='Interface with Rust errors seamlessly',
     long_description=open('README.rst').read(),
     author='Markus Unterwaditzer',
