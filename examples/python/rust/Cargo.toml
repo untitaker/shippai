@@ -8,7 +8,8 @@ name = "shippai_example"
 crate-type = ["cdylib"]
 
 [dependencies]
-failure = "0.1"
+# backtrace is not required, only if you want merged stacktraces
+failure = { version = "0.1", features = ["backtrace"] }
 shippai = { path = "../../../rust/", version = "*" }
 
 [build-dependencies]
