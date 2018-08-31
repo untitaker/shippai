@@ -31,7 +31,7 @@ class ShippaiException(Exception):
             _variants = None
             _parent = cls
 
-        Exc.__name__ = variant_name
+        Exc.__name__ = Exc.__qualname__ = variant_name
 
         setattr(cls, variant_name, Exc)
         cls._variants[discriminant] = Exc
@@ -72,7 +72,7 @@ class Shippai(object):
 
             class Exc(ShippaiException):
                 pass
-            Exc.__name__ = name
+            Exc.__name__ = Exc.__qualname__ = name
             errors[name] = Exc
             return Exc
 
