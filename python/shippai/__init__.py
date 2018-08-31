@@ -6,6 +6,8 @@ from types import CodeType
 
 PY2 = sys.version_info[0] == 2
 
+HASH_FUNC = re.compile("::h[a-f0-9]{16}$")
+
 
 class ShippaiException(Exception):
     _variants = None
@@ -220,6 +222,7 @@ class _FailureDebugParser(object):
             self.parse_filename_and_lineno(line)
         else:
             funcname = line.split(' - ')[-1]
+            funcname = re.sub(HASH_FUNC, "", funcname)
             self.output.append(_RustFrame(None, None, funcname))
 
     def parse_filename_and_lineno(self, line):
@@ -289,4 +292,4 @@ def _append_frame(exc_info, frame):
                         code.co_lnotab, (), ())
 
     ns = dict(_shippai_exc_info=exc_info)
-    exec(code, ns)
+    exec(code, ns, {})
