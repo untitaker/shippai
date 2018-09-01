@@ -1,6 +1,6 @@
 [package]
 name = "shippai"
-version = "0.3.1"
+version = "0.3.2"
 description = "failure in other languages"
 authors = ["Markus Unterwaditzer <markus@unterwaditzer.net>"]
 license = "MIT"
